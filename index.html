@@ -1,0 +1,334 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
+<title>Bel 💖 Matheus - Jogo do Amor</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=League+Spartan&display=swap');
+  @import url('https://fonts.googleapis.com/css2?family=Sacramento&display=swap');
+  html, body {
+    margin: 0; padding: 0;
+    height: 100%;
+    background: linear-gradient(135deg, #ffd6db 0%, #ff96a9 100%);
+    font-family: 'League Spartan', sans-serif;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    user-select: none;
+  }
+  body {
+    max-width: 400px;
+    min-height: 600px;
+    padding: 20px;
+    box-sizing: border-box;
+  }
+  #game-container {
+    background: #fff0f6;
+    border-radius: 20px;
+    box-shadow: 0 12px 25px rgba(255, 105, 180, 0.25);
+    width: 100%;
+    max-width: 380px;
+    padding: 20px 20px 40px 20px;
+    box-sizing: border-box;
+    text-align: center;
+    position: relative;
+  }
+  h1 {
+    font-family: 'Sacramento', cursive;
+    font-size: 3.2rem;
+    margin-bottom: 6px;
+    color: #ff3f6c;
+    text-shadow: 2px 2px 6px #ff9fba;
+  }
+  h2 {
+    font-weight: 600;
+    font-size: 1rem;
+    color: #c13c57;
+    margin-top: 0;
+    margin-bottom: 22px;
+  }
+  #instruction {
+    font-weight: 600;
+    font-size: 1.2rem;
+    margin-bottom: 15px;
+    color: #ab3158;
+  }
+  #memory-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    grid-gap: 12px;
+    user-select: none;
+  }
+  .card {
+    background: #ffb4c1;
+    border-radius: 12px;
+    height: 80px;
+    cursor: pointer;
+    position: relative;
+    box-shadow: 0 8px 15px rgba(255, 84, 136, 0.3);
+    transform-style: preserve-3d;
+    transition: transform 0.4s ease;
+  }
+  .card.flipped {
+    transform: rotateY(180deg);
+    cursor: default;
+  }
+  .card.matched {
+    cursor: default;
+    box-shadow: 0 0 15px 4px #ff6d94;
+    filter: brightness(1.15);
+  }
+  .card-front, .card-back {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    border-radius: 12px;
+    backface-visibility: hidden;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 8px;
+    box-sizing: border-box;
+    color: #6f2e40;
+    font-weight: 700;
+    font-size: 1.1rem;
+    user-select: none;
+  }
+  .card-front {
+    background: #ff7c99;
+    transform: rotateY(180deg);
+    box-shadow: inset 0 3px 6px rgb(255 81 126 / 0.54);
+  }
+  .card-back {
+    background: #ffcad4;
+    box-shadow: inset 0 3px 6px rgb(255 81 126 / 0.3);
+  }
+  #message {
+    margin-top: 22px;
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: #c13c57;
+    min-height: 54px;
+  }
+  #final-message {
+    margin-top: 28px;
+    font-family: 'Sacramento', cursive;
+    font-size: 2.4rem;
+    color: #ff3f6c;
+    padding: 14px 12px;
+    border-radius: 24px;
+    background: linear-gradient(45deg, #ffadc0, #ff637d);
+    box-shadow: 0 12px 30px rgba(255, 101, 130, 0.6);
+  }
+  #signature {
+    margin-top: 28px;
+    font-family: 'Sacramento', cursive;
+    font-size: 1.5rem;
+    color: #a83652;
+    user-select: text;
+  }
+  button#restart-btn {
+    margin-top: 18px;
+    background: #ff637d;
+    color: white;
+    border: none;
+    padding: 14px 28px;
+    border-radius: 30px;
+    font-weight: 700;
+    font-size: 1.15rem;
+    box-shadow: 0 7px 18px rgba(255, 99, 125, 0.55);
+    cursor: pointer;
+    transition: background 0.3s ease;
+    user-select: none;
+  }
+  button#restart-btn:hover {
+    background: #ff5470;
+  }
+
+  /* Mobile adjustments */
+  @media (max-width: 400px) {
+    h1 {
+      font-size: 2.4rem;
+    }
+    .card {
+      height: 70px;
+      font-size: 0.9rem;
+    }
+    #message {
+      font-size: 1rem;
+    }
+    #final-message {
+      font-size: 1.9rem;
+    }
+    button#restart-btn {
+      padding: 12px 24px;
+      font-size: 1rem;
+    }
+  }
+</style>
+</head>
+<body>
+  <main id="game-container" aria-label="Jogo da memória de amor entre Bel e Matheus">
+    <h1>Bel &amp; Matheus ❤️</h1>
+    <h2>Jogo do Amor e Confiança</h2>
+    <div id="instruction">Clique nas cartas para encontrar os pares - revela o amor e a certeza!</div>
+    <section id="memory-grid" role="grid" aria-live="polite" aria-relevant="additions"></section>
+    <div id="message" role="alert" aria-live="assertive"></div>
+    <div id="final-message" role="alert"></div>
+    <button id="restart-btn" hidden aria-label="Reiniciar jogo">Jogar de novo</button>
+    <div id="signature">Feito com 💖 por Bel</div>
+  </main>
+<script>
+  (() => {
+    const grid = document.getElementById('memory-grid');
+    const message = document.getElementById('message');
+    const finalMessage = document.getElementById('final-message');
+    const restartBtn = document.getElementById('restart-btn');
+
+    // Cartas: frases amorosas e símbolos de confiança (pares)
+    const cardsData = [
+      {id:1, textFront:'❤️', textBack:'Eu amo você, Matheus!'},
+      {id:2, textFront:'🔒', textBack:'Nunca vou te trair, prometo!'},
+      {id:3, textFront:'💕', textBack:'Você é meu doce favorito.'},
+      {id:4, textFront:'🤝', textBack:'Confiança é tudo entre a gente.'},
+      {id:5, textFront:'😍', textBack:'Meu coração só quer você.'},
+      {id:6, textFront:'🛡️', textBack:'Meu amor te protege sempre.'},
+      {id:7, textFront:'🌹', textBack:'Cada dia é um presente com você.'},
+      {id:8, textFront:'✨', textBack:'Juntos brilhamos mais fortes.'}
+    ];
+
+    // Cada par deve aparecer duas vezes - embaralhar a matriz
+    let cardSet = [...cardsData, ...cardsData];
+
+    function shuffle(array) {
+      let currentIndex = array.length, temporaryValue, randomIndex;
+      while (currentIndex !== 0) {
+        randomIndex = Math.floor(Math.random() * currentIndex);
+        currentIndex--;
+        temporaryValue = array[currentIndex];
+        array[currentIndex] = array[randomIndex];
+        array[randomIndex] = temporaryValue;
+      }
+      return array;
+    }
+
+    // Variáveis controle de jogo
+    let firstCard = null;
+    let secondCard = null;
+    let lockBoard = false;
+    let matchedPairs = 0;
+
+    function createCardElement(card) {
+      const cardElement = document.createElement('div');
+      cardElement.classList.add('card');
+      cardElement.setAttribute('role', 'gridcell');
+      cardElement.setAttribute('tabindex', '0');
+      cardElement.dataset.id = card.id;
+      cardElement.dataset.matched = 'false';
+
+      const front = document.createElement('div');
+      front.classList.add('card-front');
+      front.textContent = card.textFront;
+
+      const back = document.createElement('div');
+      back.classList.add('card-back');
+      back.textContent = card.textBack;
+
+      cardElement.appendChild(front);
+      cardElement.appendChild(back);
+
+      // Eventos
+      function flipCard() {
+        if(lockBoard) return;
+        if(cardElement === firstCard) return;
+        if(cardElement.dataset.matched === 'true') return;
+
+        cardElement.classList.add('flipped');
+
+        if(!firstCard) {
+          firstCard = cardElement;
+          return;
+        }
+        secondCard = cardElement;
+        lockBoard = true;
+
+        checkForMatch();
+      }
+
+      cardElement.addEventListener('click', flipCard);
+      cardElement.addEventListener('keydown', (e) => {
+        if(['Enter',' '].includes(e.key)) {
+          e.preventDefault();
+          flipCard();
+        }
+      });
+
+      return cardElement;
+    }
+
+    function checkForMatch() {
+      const isMatch = firstCard.dataset.id === secondCard.dataset.id;
+      if(isMatch) {
+        // Marca como combinada
+        firstCard.dataset.matched = 'true';
+        secondCard.dataset.matched = 'true';
+        firstCard.classList.add('matched');
+        secondCard.classList.add('matched');
+
+        matchedPairs++;
+        message.textContent = 'Par perfeito! 🥰 ' + firstCard.querySelector('.card-back').textContent;
+
+        resetBoard();
+
+        if(matchedPairs === cardsData.length) {
+          endGame();
+        }
+      } else {
+        message.textContent = 'Ops, não combinou! Tente de novo.';
+        setTimeout(() => {
+          firstCard.classList.remove('flipped');
+          secondCard.classList.remove('flipped');
+          resetBoard();
+          message.textContent = '';
+        }, 1200);
+      }
+    }
+
+    function resetBoard() {
+      [firstCard, secondCard, lockBoard] = [null, null, false];
+    }
+
+    function endGame() {
+      finalMessage.textContent = "Matheus, eu te amo demais. Nunca me traia, tá? 💖";
+      restartBtn.hidden = false;
+      message.textContent = '';
+    }
+
+    function startGame() {
+      grid.innerHTML = '';
+      finalMessage.textContent = '';
+      message.textContent = '';
+      restartBtn.hidden = true;
+      matchedPairs = 0;
+      firstCard = null;
+      secondCard = null;
+      lockBoard = false;
+
+      cardSet = shuffle(cardSet);
+
+      cardSet.forEach(card => {
+        const cardEl = createCardElement(card);
+        grid.appendChild(cardEl);
+      });
+    }
+
+    restartBtn.addEventListener('click', startGame);
+
+    // inicia jogo automaticamente
+    startGame();
+  })();
+</script>
+</body>
+</html>
+
